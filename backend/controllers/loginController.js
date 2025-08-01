@@ -48,3 +48,56 @@ export const registerUser = [
     }
   },
 ];
+
+
+export const loginUser = async (req, res) => {
+  const email = req.body.email.trim().toLowerCase();
+  const { password } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ errors: [{ msg: "Invalid email or password" }] });
+    }
+
+    const checkPassMatch = await bcrypt.compare(password, user.password);
+
+    if (!checkPassMatch) {
+      return res
+        .status(401)
+        .json({ errors: [{ msg: "Invalid email or password" }] });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
+    );
+
+    return res.status(200).json({
+      msg: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({
+      errors: [{ msg: "There was an error logging in" }],
+    });
+  }
+};
