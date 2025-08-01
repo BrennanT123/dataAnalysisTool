@@ -2,16 +2,19 @@ import { validateNewUser } from "../lib/validation.js";
 import { PrismaClient } from "../generated/prisma/index.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { validationResult } from "express-validator";
 
 const prisma = new PrismaClient();
 
 export const registerUser = [
   validateNewUser,
   async (req, res) => {
+ 
     const validateErrors = validationResult(req);
     if (!validateErrors.isEmpty()) {
       return res.status(400).json({ errors: validateErrors.array() });
     }
+
 
     //formats the email to lowercase and trims whitespace
     const email = req.body.user_email.trim().toLowerCase();
@@ -39,11 +42,12 @@ export const registerUser = [
       if (error.code === "P2002" && error.meta?.target?.includes("email")) {
         return res
           .status(400)
-          .json({ errors: [{ msg: "Email is already registered." }] });
+          .json({ errors: [{ message: "Email is already registered." }] });
       }
       console.error("Error registering user:", error);
+      console.error(error.stack);     
       return res.status(500).json({
-        errors: [{ msg: "Internal server error. Please try again later." }],
+        errors: [{ message: "Internal server error. Please try again later." }],
       });
     }
   },
@@ -62,7 +66,7 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res
         .status(401)
-        .json({ errors: [{ msg: "Invalid email or password" }] });
+        .json({ errors: [{ message: "Invalid email or password" }] });
     }
 
     const checkPassMatch = await bcrypt.compare(password, user.password);
@@ -70,7 +74,7 @@ export const loginUser = async (req, res) => {
     if (!checkPassMatch) {
       return res
         .status(401)
-        .json({ errors: [{ msg: "Invalid email or password" }] });
+        .json({ errors: [{ message: "Invalid email or password" }] });
     }
 
     const token = jwt.sign(
@@ -85,7 +89,7 @@ export const loginUser = async (req, res) => {
     );
 
     return res.status(200).json({
-      msg: "Login successful",
+      message: "Login successful",
       token,
       user: {
         id: user.id,
@@ -97,7 +101,7 @@ export const loginUser = async (req, res) => {
   } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({
-      errors: [{ msg: "There was an error logging in" }],
+      errors: [{ message: "There was an error logging in" }],
     });
   }
 };

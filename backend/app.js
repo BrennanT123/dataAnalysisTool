@@ -50,4 +50,9 @@ app.use("/loginRouter", loginRouter);
 
 // Start the session
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Express app listening on port ${PORT}!`));
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => console.log(`Express app listening on port ${PORT}!`));
+}
+
+
+export default app; //for testing
