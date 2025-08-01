@@ -29,7 +29,7 @@ export const registerUser = [
         },
       });
       return res.status(201).json({
-        message: "User registered successfully",
+        msg: "User registered successfully",
         user: {
           id: newUser.id,
           email: newUser.email,
@@ -42,17 +42,16 @@ export const registerUser = [
       if (error.code === "P2002" && error.meta?.target?.includes("email")) {
         return res
           .status(400)
-          .json({ errors: [{ message: "Email is already registered." }] });
+          .json({ errors: [{ msg: "Email is already registered." }] });
       }
       console.error("Error registering user:", error);
       console.error(error.stack);     
       return res.status(500).json({
-        errors: [{ message: "Internal server error. Please try again later." }],
+        errors: [{ msg: "Internal server error. Please try again later." }],
       });
     }
   },
 ];
-
 
 export const loginUser = async (req, res) => {
   const email = req.body.email.trim().toLowerCase();
@@ -66,7 +65,7 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res
         .status(401)
-        .json({ errors: [{ message: "Invalid email or password" }] });
+        .json({ errors: [{ msg: "Invalid email or password" }] });
     }
 
     const checkPassMatch = await bcrypt.compare(password, user.password);
@@ -74,7 +73,7 @@ export const loginUser = async (req, res) => {
     if (!checkPassMatch) {
       return res
         .status(401)
-        .json({ errors: [{ message: "Invalid email or password" }] });
+        .json({ errors: [{ msg: "Invalid email or password" }] });
     }
 
     const token = jwt.sign(
@@ -89,7 +88,7 @@ export const loginUser = async (req, res) => {
     );
 
     return res.status(200).json({
-      message: "Login successful",
+      msg: "Login successful",
       token,
       user: {
         id: user.id,
@@ -101,7 +100,7 @@ export const loginUser = async (req, res) => {
   } catch (err) {
     console.error("Login error:", err);
     return res.status(500).json({
-      errors: [{ message: "There was an error logging in" }],
+      errors: [{ msg: "There was an error logging in" }],
     });
   }
 };
