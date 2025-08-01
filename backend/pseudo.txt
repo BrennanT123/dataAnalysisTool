@@ -1,0 +1,12 @@
+backend
+
+Create new skill
+- Allow you to add subskills
+    -subskill difficulty 1-10
+
+milestone list
+    -allows you to view and upload milestones
+    -adding a new milestone 
+        - can add media, links, and text 
+        - must include a subskill tag
+        

@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String       @id @default(cuid())
+  email     String       @unique
+  name      String?
+  password  String
+  datasets  Dataset[]
+  charts    SavedChart[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model Dataset {
+  id         String       @id @default(cuid())
+  name       String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String
+  columns    String[] //e.g. ["date", "revenue", 'category'];
+  rows       Json //array of objects: [{ Date: "2024-01-01", Revenue: 120 }, ...]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  SavedChart SavedChart[]
+}
+
+model SavedChart {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  dataset   Dataset  @relation(fields: [datasetId], references: [id])
+  datasetId String
+  chartType String // e.g., "bar", "line", "pie"
+  xAxis     String //name of the column for x-axis
+  yAxis     String //name of the column for y-axis
+  title     String? // optional title for the chart
+  options   Json? // e.g., { "color": "blue", "stacked
+  groupBy   String? // name of the column to group by, if applicable
+  filters   Json? // e.g., { "Category": "Electronics" }
+  createdAt DateTime @default(now())
+}
