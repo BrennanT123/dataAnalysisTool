@@ -1,10 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-import dataRouter from "./routes/dataRouter";
+import dataRouter from "./routes/dataRouter.js";
 import cors from "cors";
 import helmet from "helmet";
-import authRouter from "./routes/authRouter";
-import loginRouter from "./routes/loginRouter";
+import authRouter from "./routes/authRouter.js";
+import loginRouter from "./routes/loginRouter.js";
 
 dotenv.config();
 
